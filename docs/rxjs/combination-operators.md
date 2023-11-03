@@ -118,6 +118,7 @@ concat(
 ## merge
 Lets you subscribe to multiple observables and emits values as they occur.
 Creates an observable by merging together other observables.
+Merge should be used when the observables relate to each other and have a common solution.
 
 ```ts
 import {merge} from "rxjs";
@@ -134,6 +135,67 @@ merge(
 ).subscribe(console.log)
 ```
 
+```ts title="Practical Example"
+// element refs
+const countdown = document.getElementById('countdown');
+const message = document.getElementById('message');
+const pauseButton = document.getElementById('abort');
+const startButton = document.getElementById('start');
+
+// streams
+const counter$ = interval(1000);
+const pauseClick$ = fromEvent(pauseButton, 'click');
+const startClick$ = fromEvent(startButton, 'click');
+
+const COUNTDOWN_FROM = 10;
+
+merge(
+    startClick$.pipe(mapTo(true)),
+    pauseClick$.pipe(mapTo(false))
+).pipe(
+    // switchmap to counter
+    switchMap(shouldStart => shouldStart ? counter$ : of(null)),
+    mapTo(-1),
+    scan((accumulator, current) => {
+      return accumulator + current;
+    }, COUNTDOWN_FROM),
+    takeWhile(value => value >= 0),
+    startWith(COUNTDOWN_FROM)
+)
+.subscribe(value => {
+  countdown.innerHTML = value;
+  if (!value) {
+    message.innerHTML = 'Liftoff!'
+  }
+})
+```
+
 ## combineLatest
+CombineLatest creates an observable from a number of other variables.
+On subscription, it subscribes to all inner observables, after all observables
+have emitted at least one value it will emit the last value emitted from each
+observable as an array each time any of the observables emits a value.
+
+```ts
+import {combineLatest} from "rxjs";
+```
+
+```ts title="Code"
+const keyup$ = fromEvent(document, 'keyup');
+const click$ = fromEvent(document, 'click');
+
+
+combineLatest(
+    [keyup$,
+      click$]
+).subscribe(console.log)
+
+```
+
+```ts title="Practical Example"
+
+```
+
+## withLatestFrom
 
 ## forkJoin
