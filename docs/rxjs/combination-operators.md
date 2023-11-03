@@ -116,7 +116,23 @@ concat(
 ```
 
 ## merge
-Lets you subscribe to multiple observables and emits values as they occur
+Lets you subscribe to multiple observables and emits values as they occur.
+Creates an observable by merging together other observables.
+
+```ts
+import {merge} from "rxjs";
+```
+
+```ts title="Code"
+const keyup$ = fromEvent(document, 'keyup');
+const click$ = fromEvent(document, 'click');
+
+
+merge(
+    keyup$,
+    click$
+).subscribe(console.log)
+```
 
 ## combineLatest
 
