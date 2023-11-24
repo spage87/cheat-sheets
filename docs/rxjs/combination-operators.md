@@ -193,9 +193,65 @@ combineLatest(
 ```
 
 ```ts title="Practical Example"
-
+combineLatest(
+    [keyupAsValue(first),
+    keyupAsValue(second)]
+).pipe(
+    filter(([first, second]) => {
+        return !isNaN(first) && !isNaN(second)
+    }),
+    map(([first, second]) => first + second)
+)
+.subscribe(console.log)
 ```
 
 ## withLatestFrom
+withLatestFrom is similar to combineLatest, but it is a pipeable operator that takes in a secondary stream.
+The value will only be emitted if both subscriptions have a value when the first is activated. It will not occur when only the second one is activated.
+
+
+```ts title="Code"
+click$.pipe(
+    withLatestFrom(interval(1000))
+).subscribe(console.log)
+
+```
 
 ## forkJoin
+forkJoin takes in a number of observables and once all observables have completed it emits
+the last value emitted from each of them.
+
+```ts title="Code"
+const numbers$ = of(1,2,3);
+const letters$ = of('a', 'b', 'c');
+
+forkJoin(
+    [ numbers$, letters$]
+).subscribe(console.log)
+
+```
+
+
+```ts title="Output"
+[3, 'c']
+```
+
+If you'd rather output an object than an array you can do the following.
+
+```ts title="Code"
+const numbers$ = of(1,2,3);
+const letters$ = of('a', 'b', 'c');
+
+forkJoin(
+    { numbers: numbers$, letters: letters$ }
+).subscribe(console.log)
+
+```
+
+
+```ts title="Output"
+{
+  letters: "c";
+  numbers: 3;
+}
+```
